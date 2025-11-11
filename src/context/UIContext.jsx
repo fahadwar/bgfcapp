@@ -8,7 +8,6 @@ export function UIProvider({ children }) {
   const [onboardingComplete, setOnboardingComplete] = useState(false);
   const [notificationPrompted, setNotificationPrompted] = useState(false);
   const [locationPrompted, setLocationPrompted] = useState(false);
-  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -25,18 +24,6 @@ export function UIProvider({ children }) {
     }
   };
 
-  useEffect(() => {
-    if (!toast) return undefined;
-    const timeout = setTimeout(() => setToast(null), toast.duration ?? 4000);
-    return () => clearTimeout(timeout);
-  }, [toast]);
-
-  const showToast = (message, variant = 'success', duration = 4000) => {
-    setToast({ id: Date.now(), message, variant, duration });
-  };
-
-  const hideToast = () => setToast(null);
-
   const value = useMemo(
     () => ({
       onboardingComplete,
@@ -44,12 +31,9 @@ export function UIProvider({ children }) {
       notificationPrompted,
       setNotificationPrompted,
       locationPrompted,
-      setLocationPrompted,
-      toast,
-      showToast,
-      hideToast
+      setLocationPrompted
     }),
-    [onboardingComplete, notificationPrompted, locationPrompted, toast]
+    [onboardingComplete, notificationPrompted, locationPrompted]
   );
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;

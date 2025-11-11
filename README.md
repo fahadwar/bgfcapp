@@ -51,46 +51,6 @@ VITE_ADMIN_EMAILS=you@bgfc.app,another@bgfc.app
 
 > The app automatically falls back to mock Firestore data when Firebase is not configured so you can explore the UX immediately.
 
-- `VITE_DEV_ADMIN_BYPASS` temporarily elevates the signed-in user to admin when set to `true` for local testing.
-- `VITE_ADMIN_EMAILS` provides a comma-separated fallback allow list for staff accounts when Firebase custom claims are not yet configured.
-
-### Admin Control Room (`/admin`)
-
-- Sign in with a Firebase Auth user that has the custom claim `admin: true` (or is present in `VITE_ADMIN_EMAILS`).
-- Visit `/admin` to access the Control Room dashboard. Non-admins receive a 403 guard screen.
-- Manage promotions, matches (including CSV import), news posts with markdown preview, ticket link destinations, and Man of the Match voting options directly from the UI.
-- All writes automatically attach `updatedAt` and `updatedBy` metadata for auditability.
-
-Wrap the app with secure Firestore and Storage rules to protect public data while allowing trusted admins to publish updates:
-
-```txt
-// firestore.rules
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read: if true;
-      allow write: if request.auth.token.admin == true;
-    }
-  }
-}
-```
-
-```txt
-// storage.rules
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth.token.admin == true;
-    }
-  }
-}
-```
-
-> Ensure you set the custom claim via a privileged server process or the Firebase Admin SDK before deploying the admin interface.
-
 ### Firebase Cloud Messaging service worker
 
 Update `public/firebase-messaging-sw.js` with your Firebase project configuration before deploying push notifications:

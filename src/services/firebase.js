@@ -18,13 +18,8 @@ import {
   doc,
   setDoc,
   updateDoc,
-  increment,
-  addDoc,
-  deleteDoc,
-  serverTimestamp,
-  writeBatch
+  increment
 } from 'firebase/firestore';
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getMessaging, getToken, onMessage, isSupported } from 'firebase/messaging';
 
 const firebaseConfig = {
@@ -47,7 +42,6 @@ if (hasFirebaseConfig && !getApps().length) {
 
 const auth = app ? getAuth(app) : null;
 const db = app ? getFirestore(app) : null;
-const storage = app ? getStorage(app) : null;
 
 let messaging;
 
@@ -63,7 +57,6 @@ export {
   app,
   auth,
   db,
-  storage,
   getMessagingInstance,
   GoogleAuthProvider,
   FacebookAuthProvider,
@@ -80,13 +73,6 @@ export {
   setDoc,
   updateDoc,
   increment,
-  addDoc,
-  deleteDoc,
-  serverTimestamp,
-  writeBatch,
-  storageRef,
-  uploadBytes,
-  getDownloadURL,
   getToken,
   onMessage,
   hasFirebaseConfig

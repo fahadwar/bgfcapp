@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import {
   db,
   collection,
@@ -53,48 +53,7 @@ const normalizeVotingDoc = (docSnapshot) => {
       name: player.name ?? 'Player',
       position: player.position ?? 'POS',
       votes: player.votes ?? (typeof player === 'number' ? player : 0)
-    })),
-    isActive: data.isActive ?? true
-  };
-};
-
-const normalizeMatchDoc = (docSnapshot) => {
-  if (!docSnapshot) return null;
-  const data = docSnapshot.data ? docSnapshot.data() : docSnapshot;
-  const id = docSnapshot.id ?? data.id;
-  const score = data.score;
-  const resolveScoreDisplay = () => {
-    if (!score) {
-      return typeof data.scoreDisplay === 'string' ? data.scoreDisplay : data.result ?? null;
-    }
-    if (typeof score === 'string') return score;
-    const home = score.bgfc ?? score.home ?? score.bg ?? '';
-    const opp = score.opp ?? score.away ?? score.op ?? '';
-    if (home === '' && opp === '') return null;
-    return `${home}-${opp}`;
-  };
-
-  const scoreDisplay = resolveScoreDisplay();
-
-  return {
-    id,
-    ...data,
-    home: data.home ?? true,
-    ticketsUrl: data.ticketsUrl ?? data.ticketUrl ?? '',
-    ticketUrl: data.ticketUrl ?? data.ticketsUrl ?? '',
-    mapUrl: data.mapUrl ?? '',
-    logoUrl: data.logoUrl ?? data.opponentLogo ?? '',
-    broadcast: data.broadcast ?? 'BGFC+ App',
-    scoreDisplay,
-    score:
-      typeof score === 'object' && score !== null
-        ? score
-        : scoreDisplay
-          ? {
-              bgfc: scoreDisplay.split('-')[0],
-              opp: scoreDisplay.split('-')[1]
-            }
-          : null
+    }))
   };
 };
 
@@ -108,59 +67,48 @@ export function DataProvider({ children }) {
   const [loading, setLoading] = useState(Boolean(db));
   const [userVotes, setUserVotes] = useState(getStoredVotes);
 
-  const fetchCollections = useCallback(async () => {
-    if (!db) {
-      setLoading(false);
-      return;
-    }
-    try {
-      setLoading(true);
-      const [promosSnap, matchesSnap, newsSnap, ticketsSnap, votingSnap] = await Promise.all([
-        getDocs(collection(db, 'promotions')),
-        getDocs(collection(db, 'matches')),
-        getDocs(collection(db, 'news')),
-        getDocs(collection(db, 'tickets_links')),
-        getDocs(collection(db, 'motm_votes'))
-      ]);
-
-      const nextPromotions = promosSnap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
-      const nextMatches = matchesSnap.docs
-        .map((docSnap) => normalizeMatchDoc(docSnap))
-        .filter(Boolean);
-      const nextNews = newsSnap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
-      const nextTickets = ticketsSnap.docs.reduce((acc, docSnap) => {
-        const data = docSnap.data();
-        return {
-          ...acc,
-          [docSnap.id]: {
-            label: data.label ?? docSnap.id,
-            url: data.url ?? data.link ?? '#'
-          }
-        };
-      }, {});
-      const activeVotingDoc = votingSnap.docs.find((voteDoc) => voteDoc.data().isActive);
-      const nextVoting = normalizeVotingDoc(activeVotingDoc ?? votingSnap.docs[0]);
-
-      setPromotions(nextPromotions.length ? nextPromotions : mockPromotions);
-      setMatches(nextMatches.length ? nextMatches : mockMatches.map((match) => normalizeMatchDoc({ id: match.id, data: () => match })));
-      setNews(nextNews.length ? nextNews : mockNews);
-      setTicketLinks(Object.keys(nextTickets).length ? nextTickets : mockTicketLinks);
-      setMotm(nextVoting || mockVoting);
-    } catch (error) {
-      console.error('Error fetching Firestore data', error);
-      setPromotions(mockPromotions);
-      setMatches(mockMatches);
-      setNews(mockNews);
-      setTicketLinks(mockTicketLinks);
-      setMotm(mockVoting);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
+    const fetchCollections = async () => {
+      if (!db) {
+        setLoading(false);
+        return;
+      }
+      try {
+        setLoading(true);
+        const [promosSnap, matchesSnap, newsSnap, ticketsSnap, votingSnap] = await Promise.all([
+          getDocs(collection(db, 'promotions')),
+          getDocs(collection(db, 'matches')),
+          getDocs(collection(db, 'news')),
+          getDocs(collection(db, 'tickets_links')),
+          getDocs(collection(db, 'motm_votes'))
+        ]);
+
+        const nextPromotions = promosSnap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+        const nextMatches = matchesSnap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+        const nextNews = newsSnap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+        const nextTickets = ticketsSnap.docs.reduce((acc, docSnap) => ({ ...acc, [docSnap.id]: docSnap.data().url }), {});
+        const activeVotingDoc = votingSnap.docs.find((voteDoc) => voteDoc.data().isActive);
+        const nextVoting = normalizeVotingDoc(activeVotingDoc ?? votingSnap.docs[0]);
+
+        setPromotions(nextPromotions.length ? nextPromotions : mockPromotions);
+        setMatches(nextMatches.length ? nextMatches : mockMatches);
+        setNews(nextNews.length ? nextNews : mockNews);
+        setTicketLinks(Object.keys(nextTickets).length ? nextTickets : mockTicketLinks);
+        setMotm(nextVoting || mockVoting);
+      } catch (error) {
+        console.error('Error fetching Firestore data', error);
+        setPromotions(mockPromotions);
+        setMatches(mockMatches);
+        setNews(mockNews);
+        setTicketLinks(mockTicketLinks);
+        setMotm(mockVoting);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchCollections();
-  }, [fetchCollections]);
+  }, []);
 
   useEffect(() => {
     setStoredVotes(userVotes);
@@ -231,24 +179,9 @@ export function DataProvider({ children }) {
       motm,
       loading,
       voteForPlayer,
-      hasFirebaseConfig,
-      refreshData: fetchCollections,
-      setPromotions,
-      setMatches,
-      setNews,
-      setTicketLinks,
-      setMotm
+      hasFirebaseConfig
     }),
-    [
-      promotions,
-      matches,
-      news,
-      fanZoneSections,
-      ticketLinks,
-      motm,
-      loading,
-      fetchCollections
-    ]
+    [promotions, matches, news, fanZoneSections, ticketLinks, motm, loading]
   );
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

@@ -11,26 +11,21 @@ const ticketSections = [
 export default function TicketMenu({ links }) {
   return (
     <div className="space-y-3">
-      {ticketSections.map((section) => {
-        const link = links?.[section.id];
-        return (
-          <a
-            key={section.id}
-            href={link?.url ?? '#'}
+      {ticketSections.map((section) => (
+        <a
+          key={section.id}
+          href={links[section.id]}
           target="_blank"
           rel="noreferrer"
           className="card-surface flex items-center justify-between gap-4 p-5 transition hover:border-bgfc-gold/40"
-          >
-            <div>
-              <h3 className="text-lg font-display font-semibold text-white">
-                {link?.label ?? section.label}
-              </h3>
-              <p className="text-sm text-white/70">{section.description}</p>
-            </div>
-            <ArrowRightIcon className="h-6 w-6 text-bgfc-gold" />
-          </a>
-        );
-      })}
+        >
+          <div>
+            <h3 className="text-lg font-display font-semibold text-white">{section.label}</h3>
+            <p className="text-sm text-white/70">{section.description}</p>
+          </div>
+          <ArrowRightIcon className="h-6 w-6 text-bgfc-gold" />
+        </a>
+      ))}
     </div>
   );
 }

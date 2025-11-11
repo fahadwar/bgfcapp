@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useUI } from '../context/UIContext.jsx';
 import OnboardingModal from './OnboardingModal.jsx';
 import PermissionPrompts from './PermissionPrompts.jsx';
-import Toast from './Toast.jsx';
 
 const navigation = [
   { name: 'Home', href: '/', icon: 'home' },
@@ -65,7 +64,6 @@ export default function Layout({ children }) {
   const { onboardingComplete } = useUI();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-  const content = children ?? <Outlet />;
 
   return (
     <div className="min-h-screen bgfc-gradient">
@@ -130,7 +128,7 @@ export default function Layout({ children }) {
         )}
       </header>
       <main className="mx-auto flex max-w-6xl flex-1 flex-col px-4 pb-24 pt-6 md:px-6">
-        {content}
+        {children}
       </main>
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/5 bg-bgfc-charcoal/90 backdrop-blur md:hidden">
         <div className="mx-auto flex max-w-3xl items-center justify-around px-6 py-3">
@@ -153,7 +151,6 @@ export default function Layout({ children }) {
       </nav>
       {!onboardingComplete && <OnboardingModal />}
       <PermissionPrompts />
-      <Toast />
     </div>
   );
 }

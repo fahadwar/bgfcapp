@@ -134,11 +134,11 @@ export const mockFanZoneSections = [
 ];
 
 export const mockTicketLinks = {
-  manage: { label: 'Manage My Tickets', url: 'https://bgfc.app/tickets/manage' },
-  single: { label: 'Single Game Tickets', url: 'https://bgfc.app/tickets/single' },
-  group: { label: 'Group Tickets', url: 'https://bgfc.app/tickets/group' },
-  season: { label: 'Season Tickets', url: 'https://bgfc.app/tickets/season' },
-  contact: { label: 'Contact Ticket Office', url: 'https://bgfc.app/tickets/contact' }
+  manage: 'https://bgfc.app/tickets/manage',
+  single: 'https://bgfc.app/tickets/single',
+  group: 'https://bgfc.app/tickets/group',
+  season: 'https://bgfc.app/tickets/season',
+  contact: 'https://bgfc.app/tickets/contact'
 };
 
 export const mockVoting = {
@@ -148,6 +148,5 @@ export const mockVoting = {
     { id: 'player-1', name: 'Aiden Brooks', position: 'FW', votes: 42 },
     { id: 'player-2', name: 'Mateo Ruiz', position: 'MF', votes: 35 },
     { id: 'player-3', name: 'Jordan Ellis', position: 'GK', votes: 23 }
-  ],
-  isActive: true
+  ]
 };

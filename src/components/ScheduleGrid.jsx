@@ -23,13 +23,8 @@ export default function ScheduleGrid({ matches }) {
                 <h3 className="text-xl font-display font-semibold text-white">BGFC vs {match.opponent}</h3>
                 <p className="text-sm text-white/70">{formatDate(match.date)}</p>
                 <p className="text-sm text-white/50">{match.venue}</p>
-                {match.status === 'final' && (match.scoreDisplay || match.score) && (
-                  <p className="mt-1 text-sm font-semibold text-bgfc-gold">
-                    Final:{' '}
-                    {typeof match.score === 'object' && match.score !== null
-                      ? `${match.score.bgfc ?? 0}-${match.score.opp ?? 0}`
-                      : match.scoreDisplay ?? match.score}
-                  </p>
+                {match.status === 'final' && match.score && (
+                  <p className="mt-1 text-sm font-semibold text-bgfc-gold">Final: {match.score}</p>
                 )}
               </div>
             </div>
@@ -40,7 +35,7 @@ export default function ScheduleGrid({ matches }) {
           </div>
           <div className="flex flex-col gap-2 md:w-64">
             {match.status !== 'final' && (
-              <a href={match.ticketsUrl ?? match.ticketUrl} target="_blank" rel="noreferrer" className="btn-primary w-full">
+              <a href={match.ticketsUrl} target="_blank" rel="noreferrer" className="btn-primary w-full">
                 Get Tickets
               </a>
             )}
