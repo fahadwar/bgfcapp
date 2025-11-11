@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-bgfc-charcoal text-white min-h-screen antialiased;
+}
+
+.bgfc-gradient {
+  background: radial-gradient(circle at top left, rgba(183, 159, 94, 0.25), transparent 45%),
+    radial-gradient(circle at bottom right, rgba(183, 159, 94, 0.15), transparent 55%),
+    #0f0f0f;
+}
+
+.card-surface {
+  @apply bg-bgfc-slate/80 backdrop-blur rounded-2xl border border-white/5 shadow-lg shadow-black/40;
+}
+
+.gold-accent {
+  @apply text-bgfc-gold;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-full bg-bgfc-gold px-4 py-2 text-sm font-semibold uppercase tracking-wide text-black transition hover:bg-[#d4c291] focus:outline-none focus-visible:ring-2 focus-visible:ring-bgfc-gold/40;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center rounded-full border border-bgfc-gold/40 px-4 py-2 text-sm font-semibold text-bgfc-gold transition hover:bg-bgfc-gold/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-bgfc-gold/40;
+}
+
+.section-heading {
+  @apply text-lg font-display font-semibold tracking-wide uppercase text-bgfc-gold;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
